@@ -1,6 +1,6 @@
 # ERC721R
 
-A fully-compliant implementation of IERC721 that selects token ids pseudo-randomly.
+A fully-compliant implementation of IERC721 that selects token ids pseudo-randomly. You can read about its inspiration in [this Medium article](https://medium.com/@dumbnamenumbers/erc721r-a-new-erc721-contract-for-random-minting-so-people-dont-snipe-all-the-rares-68dd06611e5).
 
 # Usage
 
