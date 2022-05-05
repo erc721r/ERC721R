@@ -50,7 +50,7 @@ ERC721R uses the [modern version of the Fisher–Yates shuffle](https://en.wikip
 # Limitations
 
 - At this time ERC721R does not include `safeMint()` functionality. This is the result of the original author's position that the benefits of preventing users from minting to the wrong contract are outweighed by the cost of increasing surface area for reentrancy attacks.
-- ERC721R disallows contracts from minting.
+- ERC721R disallows contracts from minting for security reasons. [Read more](https://medium.com/@dumbnamenumbers/erc721r-a-new-erc721-contract-for-random-minting-so-people-dont-snipe-all-the-rares-68dd06611e5).
 
 # Credits
 
