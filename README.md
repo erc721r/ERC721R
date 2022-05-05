@@ -47,8 +47,10 @@ Finally, ERC721R exposes public `totalSupply()` and `maxSupply()` functions.
 
 ERC721R uses the [modern version of the Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm) which stores the list of available tokens and the list of minted tokens in one data structure to save gas.
 
-At this time ERC721R does not include `safeMint()` functionality. This is the result of the original author's position that the benefits of preventing users from minting to the wrong contract are outweighed by the cost of increasing surface area for reentrancy attacks.
+# Limitations
 
+- At this time ERC721R does not include `safeMint()` functionality. This is the result of the original author's position that the benefits of preventing users from minting to the wrong contract are outweighed by the cost of increasing surface area for reentrancy attacks.
+- ERC721R disallows contracts from minting.
 
 # Credits
 
