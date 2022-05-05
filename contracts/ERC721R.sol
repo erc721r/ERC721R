@@ -257,7 +257,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     function _mintRandom(address to, uint _numToMint) internal virtual {
-        require(!_msgSender().isContract(), "Contracts cannot mint");
+        require(_msgSender() == tx.origin, "Contracts cannot mint");
         require(to != address(0), "ERC721: mint to the zero address");
         require(_numToMint > 0, "ERC721r: need to mint at least one token");
         
@@ -336,7 +336,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     // Not as good as minting a specific tokenId, but will behave the same at the start
     // allowing you to explicitly mint some tokens at launch.
     function _mintAtIndex(address to, uint index) internal virtual {
-        require(!_msgSender().isContract(), "Contracts cannot mint");
+        require(_msgSender() == tx.origin, "Contracts cannot mint");
         require(to != address(0), "ERC721: mint to the zero address");
         require(_numAvailableTokens >= 1, "ERC721r: minting more tokens than available");
         
