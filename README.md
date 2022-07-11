@@ -43,6 +43,10 @@ Miners can game this, but the assumption is that in most cases it will not be wo
 
 Finally, ERC721R exposes public `totalSupply()` and `maxSupply()` functions.
 
+# Notes
+
+- ERC721r assumes the first id is 0
+
 # Implementation notes
 
 ERC721R uses the [modern version of the Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm) which stores the list of available tokens and the list of minted tokens in one data structure to save gas.
