@@ -38,6 +38,8 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
+    
+    event TestEvent(uint256[] tokenIds, uint _numToMint);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -246,8 +248,11 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
-    function _mintIdWithoutBalanceUpdate(address to, uint256 tokenId) private {
-        _beforeTokenTransfer(address(0), to, tokenId);
+    function _mintIdWithoutBalanceUpdate(address to, uint256 tokenId, uint256[] memory tokenIds, uint _numToMint ) private {
+
+        // emit TestEvent(tokenIds, _numToMint);
+
+        _beforeTokenTransfer(address(0), to, tokenId, tokenIds, _numToMint);
         
         _owners[tokenId] = to;
         
@@ -263,12 +268,15 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         
         // TODO: Probably don't need this as it will underflow and revert automatically in this case
         require(_numAvailableTokens >= _numToMint, "ERC721r: minting more tokens than available");
-        
+                
         uint updatedNumAvailableTokens = _numAvailableTokens;
+        uint256[] memory tokenIds = new uint256[](_numToMint);
+
         for (uint256 i; i < _numToMint; ++i) { // Do this ++ unchecked?
             uint256 tokenId = getRandomAvailableTokenId(to, updatedNumAvailableTokens);
+            tokenIds[i] = tokenId;
             
-            _mintIdWithoutBalanceUpdate(to, tokenId);
+            _mintIdWithoutBalanceUpdate(to, tokenId, tokenIds, _numToMint);
             
             --updatedNumAvailableTokens;
         }
@@ -343,7 +351,10 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint tokenId = getAvailableTokenAtIndex(index, _numAvailableTokens);
         --_numAvailableTokens;
         
-        _mintIdWithoutBalanceUpdate(to, tokenId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        _mintIdWithoutBalanceUpdate(to, tokenId, tokenIds, 1);
         
         _balances[to] += 1;
     }
@@ -367,7 +378,10 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         require(ERC721r.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
         require(to != address(0), "ERC721: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, tokenId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        _beforeTokenTransfer(from, to, tokenId, tokenIds, 1);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
@@ -456,7 +470,9 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId, 
+        uint256[] memory tokenIds,
+        uint _numToMint        
     ) internal virtual {}
 
     /**
