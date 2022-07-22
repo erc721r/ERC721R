@@ -39,7 +39,6 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
     
-    event TestEvent(uint256[] tokenIds, uint _numToMint);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -248,11 +247,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
 
-    function _mintIdWithoutBalanceUpdate(address to, uint256 tokenId, uint256[] memory tokenIds, uint _numToMint ) private {
-
-        // emit TestEvent(tokenIds, _numToMint);
-
-        _beforeTokenTransfer(address(0), to, tokenId, tokenIds, _numToMint);
+    function _mintIdWithoutBalanceUpdate(address to, uint256 tokenId) private {        
         
         _owners[tokenId] = to;
         
@@ -272,14 +267,19 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint updatedNumAvailableTokens = _numAvailableTokens;
         uint256[] memory tokenIds = new uint256[](_numToMint);
 
+        // gather all tokenIds in array 
         for (uint256 i; i < _numToMint; ++i) { // Do this ++ unchecked?
             uint256 tokenId = getRandomAvailableTokenId(to, updatedNumAvailableTokens);
-            tokenIds[i] = tokenId;
-            
-            _mintIdWithoutBalanceUpdate(to, tokenId, tokenIds, _numToMint);
-            
+            tokenIds[i] = tokenId;                        
             --updatedNumAvailableTokens;
         }
+
+        _beforeTokenTransfer(address(0), to, 0, tokenIds); // 0 placeholder for tokenId param
+
+        // iterate through all tokenIds and mint 
+        for (uint256 i; i < _numToMint; ++i) { // using _numToMint to avoid length() function call
+             _mintIdWithoutBalanceUpdate(to, tokenIds[i]);
+        }               
         
         _numAvailableTokens = updatedNumAvailableTokens;
         _balances[to] += _numToMint;
@@ -354,7 +354,9 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint256[] memory tokenIds = new uint256[](1);
         tokenIds[0] = tokenId;
 
-        _mintIdWithoutBalanceUpdate(to, tokenId, tokenIds, 1);
+        _beforeTokenTransfer(address(0), to, tokenId, tokenIds);
+
+        _mintIdWithoutBalanceUpdate(to, tokenId);
         
         _balances[to] += 1;
     }
@@ -381,7 +383,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint256[] memory tokenIds = new uint256[](1);
         tokenIds[0] = tokenId;
 
-        _beforeTokenTransfer(from, to, tokenId, tokenIds, 1);
+        _beforeTokenTransfer(from, to, tokenId, tokenIds);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
@@ -471,8 +473,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         address from,
         address to,
         uint256 tokenId, 
-        uint256[] memory tokenIds,
-        uint _numToMint        
+        uint256[] memory tokenIds     
     ) internal virtual {}
 
     /**

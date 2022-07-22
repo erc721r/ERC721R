@@ -74,11 +74,10 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
         address from,
         address to,
         uint256 tokenId, 
-        uint256[] memory tokenIds, 
-        uint _numToMint        
+        uint256[] memory tokenIds               
     ) internal virtual override {
 
-        super._beforeTokenTransfer(from, to, tokenId, tokenIds, _numToMint);
+        super._beforeTokenTransfer(from, to, tokenId, tokenIds);
 
         if (from == address(0)) {
             _addTokenToAllTokensEnumeration(tokenId);
@@ -88,7 +87,7 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
         if (to == address(0)) {
             _removeTokenFromAllTokensEnumeration(tokenId);
         } else if (to != from) {
-            _addTokenToOwnerEnumeration(to, tokenId, tokenIds, _numToMint);            
+            _addTokenToOwnerEnumeration(to, tokenId, tokenIds);            
         }
     }
 
@@ -97,14 +96,12 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
      * @param to address representing the new owner of the given token ID
      * @param tokenId uint256 ID of the token to be added to the tokens list of the given address
      */
-    function _addTokenToOwnerEnumeration(address to, uint256 tokenId, uint256[] memory tokenIds, uint _numToMint ) private {        
+    function _addTokenToOwnerEnumeration( address to, uint256 tokenId, uint256[] memory tokenIds ) private {        
         uint256 length = ERC721r.balanceOf(to);
-        
-        if(tokenIds.length == _numToMint){
-            for( uint i=0; i<tokenIds.length; ++i){
-                _ownedTokens[to][length+i] = tokenIds[i];        
-            }             
-        }
+
+        for( uint i=0; i<tokenIds.length; ++i){
+            _ownedTokens[to][length+i] = tokenIds[i];        
+        }    
 
         _ownedTokensIndex[tokenId] = length;
     }
