@@ -39,7 +39,6 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
     
-
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
@@ -263,7 +262,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         
         // TODO: Probably don't need this as it will underflow and revert automatically in this case
         require(_numAvailableTokens >= _numToMint, "ERC721r: minting more tokens than available");
-                
+
         uint updatedNumAvailableTokens = _numAvailableTokens;
         uint256[] memory tokenIds = new uint256[](_numToMint);
 
@@ -274,7 +273,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
             --updatedNumAvailableTokens;
         }
 
-        _beforeTokenTransfer(address(0), to, 0, tokenIds); // 0 placeholder for tokenId param
+        _beforeTokenTransfer(address(0), to, tokenIds); // 0 placeholder for tokenId param
 
         // iterate through all tokenIds and mint 
         for (uint256 i; i < _numToMint; ++i) { // using _numToMint to avoid length() function call
@@ -354,7 +353,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint256[] memory tokenIds = new uint256[](1);
         tokenIds[0] = tokenId;
 
-        _beforeTokenTransfer(address(0), to, tokenId, tokenIds);
+        _beforeTokenTransfer(address(0), to, tokenIds);
 
         _mintIdWithoutBalanceUpdate(to, tokenId);
         
@@ -383,7 +382,7 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
         uint256[] memory tokenIds = new uint256[](1);
         tokenIds[0] = tokenId;
 
-        _beforeTokenTransfer(from, to, tokenId, tokenIds);
+        _beforeTokenTransfer(from, to, tokenIds);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
@@ -472,7 +471,6 @@ contract ERC721r is Context, ERC165, IERC721, IERC721Metadata {
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId, 
         uint256[] memory tokenIds     
     ) internal virtual {}
 

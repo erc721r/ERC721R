@@ -73,37 +73,35 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId, 
         uint256[] memory tokenIds               
     ) internal virtual override {
 
-        super._beforeTokenTransfer(from, to, tokenId, tokenIds);
+        super._beforeTokenTransfer(from, to, tokenIds);
 
         if (from == address(0)) {
-            _addTokenToAllTokensEnumeration(tokenId);
+            _addTokenToAllTokensEnumeration(tokenIds[0]);
         } else if (from != to) {
-            _removeTokenFromOwnerEnumeration(from, tokenId);
+            _removeTokenFromOwnerEnumeration(from, tokenIds[0]);
         }
         if (to == address(0)) {
-            _removeTokenFromAllTokensEnumeration(tokenId);
+            _removeTokenFromAllTokensEnumeration(tokenIds[0]);
         } else if (to != from) {
-            _addTokenToOwnerEnumeration(to, tokenId, tokenIds);            
+            _addTokenToOwnerEnumeration(to, tokenIds);            
         }
     }
 
     /**
      * @dev Private function to add a token to this extension's ownership-tracking data structures.
      * @param to address representing the new owner of the given token ID
-     * @param tokenId uint256 ID of the token to be added to the tokens list of the given address
+     * @param tokenIds uint256 ID of the token to be added to the tokens list of the given address
      */
-    function _addTokenToOwnerEnumeration( address to, uint256 tokenId, uint256[] memory tokenIds ) private {        
+    function _addTokenToOwnerEnumeration( address to, uint256[] memory tokenIds ) private {        
         uint256 length = ERC721r.balanceOf(to);
 
         for( uint i=0; i<tokenIds.length; ++i){
-            _ownedTokens[to][length+i] = tokenIds[i];        
-        }    
-
-        _ownedTokensIndex[tokenId] = length;
+            _ownedTokens[to][length+i] = tokenIds[i];
+            _ownedTokensIndex[tokenIds[i]] = length+i;
+        }            
     }
 
     /**

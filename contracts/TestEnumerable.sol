@@ -11,12 +11,12 @@ contract TestEnerumable is ERC721r, ERC721rEnumerable {
         ERC721r(name_, symbol_, maxSupply_) {
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256[] memory tokenIdxs)    
+    function _beforeTokenTransfer(address from, address to, uint256[] memory tokenIdxs)    
         internal
         virtual
         override(ERC721r, ERC721rEnumerable)
     {
-        super._beforeTokenTransfer(from, to, tokenId, tokenIdxs);
+        super._beforeTokenTransfer(from, to, tokenIdxs);
     }
 
     function totalSupply()
