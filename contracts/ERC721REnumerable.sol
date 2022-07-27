@@ -79,7 +79,7 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
         super._beforeTokenTransfer(from, to, tokenIds);
 
         if (from == address(0)) {
-            _addTokenToAllTokensEnumeration(tokenIds[0]);
+            _addTokenToAllTokensEnumeration(tokenIds);
         } else if (from != to) {
             _removeTokenFromOwnerEnumeration(from, tokenIds[0]);
         }
@@ -106,11 +106,13 @@ abstract contract ERC721rEnumerable is ERC721r, IERC721Enumerable {
 
     /**
      * @dev Private function to add a token to this extension's token tracking data structures.
-     * @param tokenId uint256 ID of the token to be added to the tokens list
+     * @param tokenIds uint256 ID of the token to be added to the tokens list
      */
-    function _addTokenToAllTokensEnumeration(uint256 tokenId) private {
-        _allTokensIndex[tokenId] = _allTokens.length;
-        _allTokens.push(tokenId);
+    function _addTokenToAllTokensEnumeration(uint256[] memory tokenIds) private {
+        for( uint i=0; i<tokenIds.length; ++i){
+            _allTokensIndex[tokenIds[i]] = _allTokens.length+i;
+            _allTokens.push(tokenIds[i]);
+        }        
     }
 
     /**
