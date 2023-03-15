@@ -2,6 +2,14 @@
 
 A fully-compliant implementation of IERC721 that selects token ids pseudo-randomly. You can read about its inspiration in [this Medium article](https://medium.com/@dumbnamenumbers/erc721r-a-new-erc721-contract-for-random-minting-so-people-dont-snipe-all-the-rares-68dd06611e5).
 
+# March 15, 2023 update: how to use this contract
+
+This contract is for entertainment purposes only! People using Flashbots will be able to predict what they will get and decide not to go through with the mint if they don't like it. There might also be other exploits I am not aware of because the "instant reveal" mint style is impossible to securely randomize.
+
+If the randomness mechanic is an important part of your app, you really should move to a commit-reveal scheme where the user pays in a different transaction than they find out what they got.
+
+Someday I will write a library for this, but for now [this MouseDev thread is a good place to start](https://twitter.com/_MouseDev/status/1623044314983964682).
+
 # Usage
 
 ```solidity
