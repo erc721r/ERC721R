@@ -6,7 +6,7 @@
     "lint:sol": "prettier --write \"contracts/**/*.sol\""
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0"
+    "solady": "^0.0.94"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
