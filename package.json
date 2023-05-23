@@ -31,7 +31,7 @@
   },
   "author": "Tom Lehman",
   "license": "MIT",
-  "name": "erc721r",
+  "name": "@middlemarch/erc721r",
   "version": "1.0.0",
   "description": "A base contract for minting NFTs pseudo randomly",
   "bugs": {
