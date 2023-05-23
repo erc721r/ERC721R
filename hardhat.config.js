@@ -14,11 +14,11 @@ if (process.env.REPORT_COVERAGE) {
  */
 module.exports = {
   solidity: {
-    version: '0.8.12',
+    version: '0.8.17',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 200,
       },
     },
   },

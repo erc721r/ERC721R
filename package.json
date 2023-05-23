@@ -1,12 +1,13 @@
 {
   "scripts": {
     "node": "hardhat node",
+    "test": "npx hardhat test",
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:js": "eslint --ignore-path .gitignore . --fix",
     "lint:sol": "prettier --write \"contracts/**/*.sol\""
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0"
+    "solady": "^0.0.94"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
@@ -30,6 +31,9 @@
   },
   "author": "Tom Lehman",
   "license": "MIT",
+  "name": "erc721r",
+  "version": "1.0.0",
+  "description": "A base contract for minting NFTs pseudo randomly",
   "bugs": {
     "url": "https://github.com/erc721r/ERC721R/issues"
   },
