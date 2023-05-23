@@ -1,6 +1,7 @@
 {
   "scripts": {
     "node": "hardhat node",
+    "test": "npx hardhat test",
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:js": "eslint --ignore-path .gitignore . --fix",
     "lint:sol": "prettier --write \"contracts/**/*.sol\""
