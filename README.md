@@ -18,9 +18,9 @@ If you want to learn more, [this MouseDev thread is a good place to start](https
 
 import {ERC721r} from "@middlemarch/erc721r/contracts/ERC721r.sol";
 
-contract FashionHatPunks is ERC721r {
+contract MyFunNFT is ERC721r {
     // 10_000 is the collection's maxSupply
-    constructor() ERC721r("Fashion Hat Punks", "HATPUNK", 10_000) {}
+    constructor() ERC721r("My Fun NFT", "SYMBOL", 10_000) {}
     
     // You must implement tokenURI
     function tokenURI(uint tokenId) public view override returns (string memory) {
