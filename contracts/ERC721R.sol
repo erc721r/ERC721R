@@ -18,7 +18,7 @@ abstract contract ERC721r is ERC721 {
     string private _symbol;
     
     mapping(uint256 => uint256) private _availableTokens;
-    uint256 private _numAvailableTokens;
+    uint256 public remainingSupply;
     
     uint256 public immutable maxSupply;
     
@@ -26,11 +26,11 @@ abstract contract ERC721r is ERC721 {
         _name = name_;
         _symbol = symbol_;
         maxSupply = maxSupply_;
-        _numAvailableTokens = maxSupply_;
+        remainingSupply = maxSupply_;
     }
     
     function totalSupply() public view virtual returns (uint256) {
-        return maxSupply - _numAvailableTokens;
+        return maxSupply - remainingSupply;
     }
     
     function name() public view virtual override returns (string memory) {
@@ -48,38 +48,38 @@ abstract contract ERC721r is ERC721 {
     function _mintRandom(address to, uint256 _numToMint) internal virtual {
         if (msg.sender != tx.origin) revert ContractsCannotMint();
         if (_numToMint == 0) revert MustMintAtLeastOneToken();
-        if (_numAvailableTokens < _numToMint) revert NotEnoughAvailableTokens();
+        if (remainingSupply < _numToMint) revert NotEnoughAvailableTokens();
         
         LibPRNG.PRNG memory prng = LibPRNG.PRNG(uint256(keccak256(abi.encodePacked(
             block.timestamp, block.difficulty
         ))));
         
-        uint256 updatedNumAvailableTokens = _numAvailableTokens;
+        uint256 updatedRemainingSupply = remainingSupply;
         
         for (uint256 i; i < _numToMint; ) {
-            uint256 randomIndex = prng.uniform(updatedNumAvailableTokens);
+            uint256 randomIndex = prng.uniform(updatedRemainingSupply);
 
-            uint256 tokenId = getAvailableTokenAtIndex(randomIndex, updatedNumAvailableTokens);
+            uint256 tokenId = getAvailableTokenAtIndex(randomIndex, updatedRemainingSupply);
             
             _mint(to, tokenId);
             
-            --updatedNumAvailableTokens;
+            --updatedRemainingSupply;
             
             unchecked {++i;}
         }
         
         _incrementAmountMinted(to, uint32(_numToMint));
-        _numAvailableTokens = updatedNumAvailableTokens;
+        remainingSupply = updatedRemainingSupply;
     }
     
     // Must be called in descending order of index
     function _mintAtIndex(address to, uint256 index) internal virtual {
         if (msg.sender != tx.origin) revert ContractsCannotMint();
-        if (_numAvailableTokens == 0) revert NotEnoughAvailableTokens();
+        if (remainingSupply == 0) revert NotEnoughAvailableTokens();
         
-        uint256 tokenId = getAvailableTokenAtIndex(index, _numAvailableTokens);
+        uint256 tokenId = getAvailableTokenAtIndex(index, remainingSupply);
         
-        --_numAvailableTokens;
+        --remainingSupply;
         _incrementAmountMinted(to, 1);
         
         _mint(to, tokenId);

@@ -4,9 +4,7 @@ const { ethers } = require('hardhat');
 describe('TestERC721r', function() {
   let TestERC721r;
   let testERC721r;
-  let owner;
   let addr1;
-  let addr2;
   let addrs;
 
   beforeEach(async function() {
@@ -42,25 +40,46 @@ describe('TestERC721r', function() {
     });
   });
 
-  // describe("Address extra data", function() {
-  //   it("Should set and get extra address data", async function() {
-  //     await testERC721r.setExtraAddressData(addr1.address, 123);
-  //     const data = await testERC721r.getAddressExtraData(addr1.address);
-  //     expect(data).to.equal(123);
-  //   });
-  // });
+  describe("Address extra data", function() {
+    it("Should set and get extra address data", async function() {
+      await testERC721r.setExtraAddressData(addr1.address, 123);
+      const data = await testERC721r.getAddressExtraData(addr1.address);
+      expect(data).to.equal(123);
+    });
+  });
+
+  describe("numberMinted", function() {
+    it("Should return correct number of minted tokens", async function() {
+      const numToMint = 5;
+      await testERC721r.mintRandom(addr1.address, numToMint);
+      const numberMinted = await testERC721r.numberMinted(addr1.address);
+      expect(numberMinted).to.equal(numToMint);
+    });
+  });
+
+  describe("Contract Minting", function() {
+    it("Should not allow contracts to mint tokens", async function() {
+      let TestERC721rContractMinting = await ethers.getContractFactory('TestERC721rContractMinting');
+      TestERC721rContractMinting = await TestERC721rContractMinting.deploy();
+      await TestERC721rContractMinting.deployed()
+
+      await expect(TestERC721rContractMinting.testMint(
+        testERC721r.address
+      )).to.be.revertedWith("ContractsCannotMint");
+    });
+  });
 
   describe("Mint Constraints", function() {
     it("Should not allow minting 0 tokens", async function() {
       await expect(testERC721r.connect(addr1).mintRandom(addr1.address, 0)).
-            to.be.revertedWith("MustMintAtLeastOneToken");
+        to.be.revertedWith("MustMintAtLeastOneToken");
     });
 
     it("Should not allow minting more than max supply", async function() {
       const maxSupply = await testERC721r.maxSupply();
 
       await expect(testERC721r.connect(addr1).mintRandom(addr1.address, maxSupply.add(1))).
-            to.be.revertedWith("NotEnoughAvailableTokens");
+        to.be.revertedWith("NotEnoughAvailableTokens");
     });
   });
 
@@ -80,13 +99,67 @@ describe('TestERC721r', function() {
     });
   });
 
+  describe("totalSupply", function() {
+    it("Should return correct total supply after minting", async function() {
+      const numToMint = 5;
+      await testERC721r.mintRandom(addr1.address, numToMint);
+      const totalSupply = await testERC721r.totalSupply();
+      expect(totalSupply).to.equal(numToMint);
+    });
+  });
+  
+  describe("Minting Edge Cases", function() {
+    it("Should correctly mint at index 0 and last index", async function() {
+      const maxSupply = await testERC721r.maxSupply();
+      await testERC721r.mintAtIndex(addr1.address, 0);
+      expect(await testERC721r.ownerOf(0)).to.equal(addr1.address);
+
+      await testERC721r.mintAtIndex(addr1.address, maxSupply - 1);
+      expect(await testERC721r.ownerOf(maxSupply - 1)).to.equal(addr1.address);
+    });
+  });
+
+  describe("remainingSupply", function() {
+    it("Should update remainingSupply correctly after minting", async function() {
+      const remaining = await testERC721r.remainingSupply();
+      const numToMint = 5;
+      await testERC721r.mintRandom(addr1.address, numToMint);
+      expect(await testERC721r.remainingSupply()).to.equal(remaining - numToMint);
+    });
+  });
+
+  describe("Random Minting", function() {
+    it("Should mint tokens in a non-sequential manner", async function() {
+      const maxSupply = (await testERC721r.maxSupply()).toNumber();
+      let mintedTokenIds = [];
+
+      await testERC721r.mintRandom(addr1.address, 20);
+
+      for (let i = 0; i < maxSupply; i++) {
+        try {
+          await testERC721r.ownerOf(i);
+          mintedTokenIds.push(i);
+        } catch (e) { }
+      }
+
+      let isSequential = true;
+      for (let i = 1; i < mintedTokenIds.length; i++) {
+        if (mintedTokenIds[i - 1] + 1 !== mintedTokenIds[i]) {
+          isSequential = false;
+          break;
+        }
+      }
+
+      expect(isSequential).to.equal(false);
+    });
+  });
 
   describe("Full Supply Minting", function() {
     it("Should mint all tokens", async function() {
       const maxSupply = await testERC721r.maxSupply();
 
-      for (let i = 0; i < maxSupply; i++) {
-        await testERC721r.mintRandom(addr1.address, 1);
+      for (let i = 0; i < (maxSupply / 10); i++) {
+        await testERC721r.mintRandom(addr1.address, 10);
       }
 
       const endBalance = await testERC721r.balanceOf(addr1.address);
