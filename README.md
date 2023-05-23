@@ -1,4 +1,4 @@
-# ERC721R
+# ERC721r
 
 An ERC721 base contract that mints tokens in a pseudo-random order. Because the token is revealed in the same transaction as the mint itself, this contract creates a fun but not fully secure experience.
 
@@ -6,31 +6,44 @@ An ERC721 base contract that mints tokens in a pseudo-random order. Because the 
 
 People using Flashbots will be able to predict what they will get and decide not to go through with the mint if they don't like it. There might also be other exploits I am not aware of because the "instant reveal" mint style is impossible to securely randomize.
 
-If the randomness mechanic is an important part of your app, you really should move to a commit-reveal scheme where the user pays in a different transaction than they find out what they got. Unfortunately this costs more gas and is less fun, so weigh this against the benefit of increased security.
+If randomness is an important part of your app, you should strongly consider moving to a commit-reveal scheme where the user pays in a different transaction from the one in which they learn what NFT they got. Unfortunately this costs more gas and is less fun, so weigh this against the benefit of increased security.
 
-If you want to learn more about this, but for now [this MouseDev thread is a good place to start](https://twitter.com/_MouseDev/status/1623044314983964682).
+If you want to learn more, [this MouseDev thread is a good place to start](https://twitter.com/_MouseDev/status/1623044314983964682).
 
 # Usage
 
+`yarn add @middlemarch/erc721r` or `npm install @middlemarch/erc721r`
+
 ```solidity
+
+import {ERC721r} from "@middlemarch/erc721r/contracts/ERC721r.sol";
+
 contract FashionHatPunks is ERC721r {
     // 10_000 is the collection's maxSupply
     constructor() ERC721r("Fashion Hat Punks", "HATPUNK", 10_000) {}
     
-    function mint(uint quantity) {
-        // ERC721r exposes a public numberMinted(address) that you can use
+    // You must implement tokenURI
+    function tokenURI(uint tokenId) public view override returns (string memory) {
+        return "some uri";
+    }
+    
+    function mint(uint quantity) external {
+        // ERC721r exposes a public numberMinted(address) that you can optionally use
         // to, e.g., enforce limits instead of using a separate mapping(address => uint)
         // which is more expensive
-        require(numberMinted(msg.sender) <= 10, "Limit 10 per address");
+        require(numberMinted(msg.sender) + quantity <= 10, "Limit 10 per address");
+        
+        // You do *not* need to do this. ERC721r handles it.
+        // require(totalSupply() + quantity <= maxSupply())
         
         _mintRandom(msg.sender, quantity);
     }
 }
 ```
 
-Erc721r exposes public `maxSupply()`, `totalSupply()` and `remainingSupply()` functions automatically.
+ERC721r exposes public `maxSupply()`, `totalSupply()` and `remainingSupply()` functions automatically.
 
-It inherits from [Solady's ERC721](https://github.com/Vectorized/solady/blob/main/src/tokens/ERC721.sol) so you also get `_getExtraData()`, `_setExtraData()`, `_getAux()`, and `_setAux()`. However you should be aware that `aux` is internally by ERC721R, so you should not use them in your own contract. Instead, use `_setExtraAddressData()` and `_getExtraAddressData()`.
+It inherits from [Solady's ERC721](https://github.com/Vectorized/solady/blob/main/src/tokens/ERC721.sol) so you also get `_getExtraData()`, `_setExtraData()`, `_getAux()`, and `_setAux()`. However you should be aware that the `aux`es are used internally by ERC721R, so you should not use them in your own contract. Instead, use `_setExtraAddressData()` and `_getExtraAddressData()`.
 
 There is also the function `_mintAtIndex(address to, uint index)` which allows you to mint non-randomly, but it will only behave as you expect if you:
 
@@ -45,7 +58,7 @@ There is also the function `_mintAtIndex(address to, uint index)` which allows y
 
 # Implementation notes
 
-ERC721R uses the [modern version of the Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm) which stores the list of available tokens and the list of minted tokens in one data structure to save gas.
+ERC721r uses the [modern version of the Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm) which stores the list of available tokens and the list of minted tokens in one data structure to save gas.
 
 # Credits
 
