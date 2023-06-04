@@ -51,7 +51,7 @@ abstract contract ERC721r is ERC721 {
         if (remainingSupply < _numToMint) revert NotEnoughAvailableTokens();
         
         LibPRNG.PRNG memory prng = LibPRNG.PRNG(uint256(keccak256(abi.encodePacked(
-            block.timestamp, block.difficulty
+            block.timestamp, block.prevrandao
         ))));
         
         uint256 updatedRemainingSupply = remainingSupply;
